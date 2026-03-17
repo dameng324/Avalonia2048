@@ -354,12 +354,50 @@ public class GameBoardTests
         // but since the board is full and stuck, any move attempt returns false.
         // We verify no moves are possible.
         await Assert.That(moved).IsFalse();
+        // CheckGameState is now always called, so GameOver should be detected.
+        await Assert.That(board.GameOver).IsTrue();
+    }
 
-        // Manually verify no move is possible in any direction
-        bool anyMove = board.Move(MoveDirection.Right)
-                    || board.Move(MoveDirection.Up)
-                    || board.Move(MoveDirection.Down);
-        await Assert.That(anyMove).IsFalse();
+    [Test]
+    public async Task GameOver_DetectedForUserReportedBoard()
+    {
+        // Exact board from the user's bug report:
+        //  2,  4,  8, 16
+        //  4, 32,  2, 256
+        //  8, 16,  8, 64
+        // 16,  4,  2,  8
+        // No valid moves exist in any direction.
+        var board = MakeBoard(new int[,]
+        {
+            {  2,  4,  8, 16 },
+            {  4, 32,  2, 256 },
+            {  8, 16,  8, 64 },
+            { 16,  4,  2,  8 }
+        });
+
+        // Attempt any move – all should return false and game over must be detected.
+        bool moved = board.Move(MoveDirection.Left);
+
+        await Assert.That(moved).IsFalse();
+        await Assert.That(board.GameOver).IsTrue();
+    }
+
+    [Test]
+    public async Task GameOver_AllDirectionsReturnFalseForUserReportedBoard()
+    {
+        // Same board tested for all 4 directions to confirm no move is possible.
+        int[,] grid =
+        {
+            {  2,  4,  8, 16 },
+            {  4, 32,  2, 256 },
+            {  8, 16,  8, 64 },
+            { 16,  4,  2,  8 }
+        };
+
+        await Assert.That(MakeBoard(grid).Move(MoveDirection.Left)).IsFalse();
+        await Assert.That(MakeBoard(grid).Move(MoveDirection.Right)).IsFalse();
+        await Assert.That(MakeBoard(grid).Move(MoveDirection.Up)).IsFalse();
+        await Assert.That(MakeBoard(grid).Move(MoveDirection.Down)).IsFalse();
     }
 
     [Test]

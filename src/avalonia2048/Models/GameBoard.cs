@@ -98,10 +98,10 @@ public class GameBoard
         }
 
         if (moved)
-        {
             AddRandomTile();
-            CheckGameState();
-        }
+
+        // Always check game state: when moved=false the board may be completely stuck.
+        CheckGameState();
 
         return moved;
     }

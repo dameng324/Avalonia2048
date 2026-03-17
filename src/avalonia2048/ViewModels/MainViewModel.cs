@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using avalonia2048.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -74,29 +74,35 @@ public partial class MainViewModel : ViewModelBase
         if (IsGameOver || IsGameWon) return;
 
         bool moved = _board.Move(direction);
+
+        // Always sync game state — CheckGameState runs even on failed moves now.
+        IsGameOver = _board.GameOver;
+        IsGameWon = _board.GameWon;
+        ShowOverlay = IsGameOver || IsGameWon;
+
         if (!moved) return;
 
         SyncFromBoard();
 
-        // Trigger animations for new tiles
-        foreach (var newTile in _board.NewTiles)
-        {
-            var tileVm = GetTile(newTile.Row, newTile.Col);
-            if (tileVm != null && TileAnimationRequested != null)
-                await TileAnimationRequested(tileVm, true);
-        }
+        // Collect animation tasks and run all concurrently.
+        var animationTasks = new List<Task>();
 
-        // Trigger animations for merged tiles
         foreach (var mergedTile in _board.MergedTiles)
         {
             var tileVm = GetTile(mergedTile.Row, mergedTile.Col);
             if (tileVm != null && TileAnimationRequested != null)
-                await TileAnimationRequested(tileVm, false);
+                animationTasks.Add(TileAnimationRequested(tileVm, false));
         }
 
-        IsGameOver = _board.GameOver;
-        IsGameWon = _board.GameWon;
-        ShowOverlay = IsGameOver || IsGameWon;
+        foreach (var newTile in _board.NewTiles)
+        {
+            var tileVm = GetTile(newTile.Row, newTile.Col);
+            if (tileVm != null && TileAnimationRequested != null)
+                animationTasks.Add(TileAnimationRequested(tileVm, true));
+        }
+
+        if (animationTasks.Count > 0)
+            await Task.WhenAll(animationTasks);
     }
 
     [RelayCommand]
