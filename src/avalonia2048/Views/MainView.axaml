@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Avalonia2048.ViewModels"
+             xmlns:views="using:Avalonia2048.Views"
+             x:Class="Avalonia2048.Views.MainView"
+             x:DataType="vm:MainViewModel"
+             Background="#faf8ef"
+             Focusable="True">
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="16">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0"
+                       Text="2048"
+                       FontSize="60"
+                       FontWeight="Bold"
+                       Foreground="#776e65"
+                       VerticalAlignment="Center"/>
+
+            <Border Grid.Column="1"
+                    Background="#bbada0"
+                    CornerRadius="6"
+                    Padding="12,8"
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="SCORE"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="#eee4da"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Score}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2"
+                    Background="#bbada0"
+                    CornerRadius="6"
+                    Padding="12,8"
+                    VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="BEST"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="#eee4da"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Best}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- New Game Button -->
+        <Button Grid.Row="1"
+                Content="New Game"
+                Command="{Binding NewGameCommand}"
+                HorizontalAlignment="Right"
+                Margin="0,0,0,12"
+                Padding="16,8"
+                Background="#8f7a66"
+                Foreground="White"
+                FontWeight="Bold"
+                FontSize="14"
+                CornerRadius="6"/>
+
+        <!-- Game Board -->
+        <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Background="#bbada0"
+                    CornerRadius="6"
+                    Padding="8">
+                <Grid>
+                    <!-- 4x4 tile grid built in code-behind -->
+                    <ItemsControl x:Name="TilesControl" ItemsSource="{Binding Tiles}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="4" Columns="4"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TileViewModel">
+                                <Border Margin="4"
+                                        Width="100"
+                                        Height="100"
+                                        CornerRadius="6"
+                                        Background="{Binding Background}"
+                                        RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                                    </Border.RenderTransform>
+                                    <TextBlock Text="{Binding Value, Converter={x:Static views:TileValueConverter.Instance}}"
+                                               FontSize="{Binding FontSize}"
+                                               FontWeight="Bold"
+                                               Foreground="{Binding Foreground}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Game Over / Win Overlay -->
+                    <Border Background="#BAeee4da"
+                            CornerRadius="6"
+                            IsVisible="{Binding ShowOverlay}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                            <TextBlock Text="{Binding IsGameWon, Converter={x:Static views:GameStateConverter.Instance}}"
+                                       FontSize="48"
+                                       FontWeight="Bold"
+                                       Foreground="#776e65"
+                                       HorizontalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                                <Button Content="Try Again"
+                                        Command="{Binding NewGameCommand}"
+                                        Background="#8f7a66"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        Padding="16,10"
+                                        CornerRadius="6"/>
+                                <Button Content="Keep Going"
+                                        Command="{Binding ContinueGameCommand}"
+                                        IsVisible="{Binding IsGameWon}"
+                                        Background="#8f7a66"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        Padding="16,10"
+                                        CornerRadius="6"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
