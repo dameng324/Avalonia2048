@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace avalonia2048.Models;
 
@@ -24,6 +23,7 @@ public class Tile
 public class GameBoard
 {
     private const int Size = 4;
+    public const int BoardSize = Size;
     private readonly Random _random = new();
 
     public int[,] Grid { get; } = new int[Size, Size];
@@ -37,6 +37,24 @@ public class GameBoard
     public GameBoard()
     {
         Reset();
+    }
+
+    /// <summary>
+    /// Creates an empty board with no random tiles, for use in tests.
+    /// </summary>
+    public GameBoard(bool empty)
+    {
+        if (!empty) Reset();
+    }
+
+    /// <summary>
+    /// Loads a specific grid layout (used in tests). Does not add random tiles or change score/state.
+    /// </summary>
+    public void LoadGrid(int[,] grid)
+    {
+        for (int r = 0; r < Size; r++)
+            for (int c = 0; c < Size; c++)
+                Grid[r, c] = grid[r, c];
     }
 
     public void Reset()
@@ -57,26 +75,25 @@ public class GameBoard
         NewTiles.Clear();
         MergedTiles.Clear();
 
-        bool[,] merged = new bool[Size, Size];
         bool moved = false;
 
         switch (direction)
         {
             case MoveDirection.Left:
                 for (int r = 0; r < Size; r++)
-                    moved |= MoveRow(r, 0, 1, merged);
+                    moved |= SlideRow(r, forward: true);
                 break;
             case MoveDirection.Right:
                 for (int r = 0; r < Size; r++)
-                    moved |= MoveRow(r, Size - 1, -1, merged);
+                    moved |= SlideRow(r, forward: false);
                 break;
             case MoveDirection.Up:
                 for (int c = 0; c < Size; c++)
-                    moved |= MoveCol(c, 0, 1, merged);
+                    moved |= SlideCol(c, forward: true);
                 break;
             case MoveDirection.Down:
                 for (int c = 0; c < Size; c++)
-                    moved |= MoveCol(c, Size - 1, -1, merged);
+                    moved |= SlideCol(c, forward: false);
                 break;
         }
 
@@ -89,103 +106,86 @@ public class GameBoard
         return moved;
     }
 
-    private bool MoveRow(int row, int startCol, int step, bool[,] merged)
+    // Slide and merge a single row left (forward=true) or right (forward=false).
+    private bool SlideRow(int row, bool forward)
     {
-        bool moved = false;
-        int target = startCol;
+        int[] line = new int[Size];
+        for (int c = 0; c < Size; c++)
+            line[c] = forward ? Grid[row, c] : Grid[row, Size - 1 - c];
 
-        for (int i = 0; i < Size; i++)
+        bool changed;
+        (line, changed) = MergeLine(line, row, isRow: true, forward);
+
+        for (int c = 0; c < Size; c++)
         {
-            int col = startCol + i * step;
-            if (col < 0 || col >= Size) break;
-
-            if (Grid[row, col] == 0) continue;
-
-            int targetCol = target;
-            // Find first empty or same-value target
-            while (targetCol != col && Grid[row, targetCol] != 0)
-                targetCol += step;
-
-            if (Grid[row, targetCol] == 0 && targetCol != col)
-            {
-                Grid[row, targetCol] = Grid[row, col];
-                Grid[row, col] = 0;
-                moved = true;
-                target = targetCol;
-            }
-            else if (Grid[row, targetCol] == Grid[row, col] && !merged[row, targetCol] && targetCol != col)
-            {
-                Grid[row, targetCol] *= 2;
-                Score += Grid[row, targetCol];
-                Grid[row, col] = 0;
-                merged[row, targetCol] = true;
-                MergedTiles.Add(new Tile { Row = row, Col = targetCol, Value = Grid[row, targetCol] });
-                target = targetCol + step;
-                moved = true;
-            }
-            else
-            {
-                if (targetCol != col)
-                {
-                    targetCol += step;
-                    Grid[row, targetCol] = Grid[row, col];
-                    Grid[row, col] = 0;
-                    moved = true;
-                }
-                target = targetCol + step;
-            }
+            int gridCol = forward ? c : Size - 1 - c;
+            Grid[row, gridCol] = line[c];
         }
-
-        return moved;
+        return changed;
     }
 
-    private bool MoveCol(int col, int startRow, int step, bool[,] merged)
+    // Slide and merge a single column up (forward=true) or down (forward=false).
+    private bool SlideCol(int col, bool forward)
     {
-        bool moved = false;
-        int target = startRow;
+        int[] line = new int[Size];
+        for (int r = 0; r < Size; r++)
+            line[r] = forward ? Grid[r, col] : Grid[Size - 1 - r, col];
 
-        for (int i = 0; i < Size; i++)
+        bool changed;
+        (line, changed) = MergeLine(line, col, isRow: false, forward);
+
+        for (int r = 0; r < Size; r++)
         {
-            int row = startRow + i * step;
-            if (row < 0 || row >= Size) break;
+            int gridRow = forward ? r : Size - 1 - r;
+            Grid[gridRow, col] = line[r];
+        }
+        return changed;
+    }
 
-            if (Grid[row, col] == 0) continue;
+    // Core compress-merge-pad algorithm applied to a 1-D line (always sliding toward index 0).
+    private (int[] result, bool changed) MergeLine(int[] line, int index, bool isRow, bool forward)
+    {
+        // 1. Compress: collect non-zero values in order.
+        var values = new List<int>(Size);
+        foreach (int v in line)
+            if (v != 0) values.Add(v);
 
-            int targetRow = target;
-            while (targetRow != row && Grid[targetRow, col] != 0)
-                targetRow += step;
+        // 2. Merge adjacent equal pairs (left-to-right through the compressed list).
+        for (int i = 0; i < values.Count - 1; i++)
+        {
+            if (values[i] == values[i + 1])
+            {
+                values[i] *= 2;
+                Score += values[i];
 
-            if (Grid[targetRow, col] == 0 && targetRow != row)
-            {
-                Grid[targetRow, col] = Grid[row, col];
-                Grid[row, col] = 0;
-                moved = true;
-                target = targetRow;
-            }
-            else if (Grid[targetRow, col] == Grid[row, col] && !merged[targetRow, col] && targetRow != row)
-            {
-                Grid[targetRow, col] *= 2;
-                Score += Grid[targetRow, col];
-                Grid[row, col] = 0;
-                merged[targetRow, col] = true;
-                MergedTiles.Add(new Tile { Row = targetRow, Col = col, Value = Grid[targetRow, col] });
-                target = targetRow + step;
-                moved = true;
-            }
-            else
-            {
-                if (targetRow != row)
+                // Record merged tile position in the original grid.
+                int mergedPos = i; // position in the padded result
+                if (isRow)
                 {
-                    targetRow += step;
-                    Grid[targetRow, col] = Grid[row, col];
-                    Grid[row, col] = 0;
-                    moved = true;
+                    int col = forward ? mergedPos : Size - 1 - mergedPos;
+                    MergedTiles.Add(new Tile { Row = index, Col = col, Value = values[i] });
                 }
-                target = targetRow + step;
+                else
+                {
+                    int row = forward ? mergedPos : Size - 1 - mergedPos;
+                    MergedTiles.Add(new Tile { Row = row, Col = index, Value = values[i] });
+                }
+
+                values.RemoveAt(i + 1);
             }
         }
 
-        return moved;
+        // 3. Pad with zeros to restore Size length.
+        var result = new int[Size];
+        for (int i = 0; i < values.Count; i++)
+            result[i] = values[i];
+
+        // 4. Check if anything changed.
+        bool changed = false;
+        for (int i = 0; i < Size; i++)
+            if (result[i] != line[i]) { changed = true; break; }
+
+        return (result, changed);
     }
 
     private void AddRandomTile()

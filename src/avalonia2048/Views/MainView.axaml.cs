@@ -53,6 +53,13 @@ public partial class MainView : UserControl
         Focus();
     }
 
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+        if (DataContext is MainViewModel vm)
+            vm.TileAnimationRequested -= AnimateTileAsync;
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
