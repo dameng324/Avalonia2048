@@ -106,7 +106,7 @@
                     </ItemsControl>
 
                     <!-- Game Over / Win Overlay -->
-                    <Border Background="#ffffff99"
+                    <Border Background="#BAeee4da"
                             CornerRadius="6"
                             IsVisible="{Binding ShowOverlay}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">

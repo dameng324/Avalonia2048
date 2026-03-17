@@ -13,15 +13,28 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly GameBoard _board = new();
     private int _bestScore;
-    private static readonly string BestScoreFile =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "avalonia2048_best.txt");
+    private static readonly string BestScoreFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "avalonia2048_best.txt"
+    );
 
-    [ObservableProperty] private ObservableCollection<TileViewModel> _tiles = new();
-    [ObservableProperty] private int _score;
-    [ObservableProperty] private int _best;
-    [ObservableProperty] private bool _isGameOver;
-    [ObservableProperty] private bool _isGameWon;
-    [ObservableProperty] private bool _showOverlay;
+    [ObservableProperty]
+    private ObservableCollection<TileViewModel> _tiles = new();
+
+    [ObservableProperty]
+    private int _score;
+
+    [ObservableProperty]
+    private int _best;
+
+    [ObservableProperty]
+    private bool _isGameOver;
+
+    [ObservableProperty]
+    private bool _isGameWon;
+
+    [ObservableProperty]
+    private bool _showOverlay;
 
     public event Func<TileViewModel, bool, Task>? TileAnimationRequested;
 
@@ -36,8 +49,8 @@ public partial class MainViewModel : ViewModelBase
     {
         Tiles.Clear();
         for (int r = 0; r < 4; r++)
-            for (int c = 0; c < 4; c++)
-                Tiles.Add(new TileViewModel(r, c));
+        for (int c = 0; c < 4; c++)
+            Tiles.Add(new TileViewModel(r, c));
     }
 
     private void SyncFromBoard()
@@ -51,12 +64,12 @@ public partial class MainViewModel : ViewModelBase
         }
 
         for (int r = 0; r < 4; r++)
-            for (int c = 0; c < 4; c++)
-            {
-                var tile = GetTile(r, c);
-                if (tile != null)
-                    tile.Value = _board.Grid[r, c];
-            }
+        for (int c = 0; c < 4; c++)
+        {
+            var tile = GetTile(r, c);
+            if (tile != null)
+                tile.Value = _board.Grid[r, c];
+        }
     }
 
     private TileViewModel? GetTile(int row, int col)
@@ -70,8 +83,10 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task Move(string directionStr)
     {
-        if (!Enum.TryParse<MoveDirection>(directionStr, out var direction)) return;
-        if (IsGameOver || IsGameWon) return;
+        if (!Enum.TryParse<MoveDirection>(directionStr, out var direction))
+            return;
+        if (IsGameOver || IsGameWon)
+            return;
 
         bool moved = _board.Move(direction);
 
@@ -80,7 +95,8 @@ public partial class MainViewModel : ViewModelBase
         IsGameWon = _board.GameWon;
         ShowOverlay = IsGameOver || IsGameWon;
 
-        if (!moved) return;
+        if (!moved)
+            return;
 
         SyncFromBoard();
 
@@ -129,7 +145,10 @@ public partial class MainViewModel : ViewModelBase
             if (File.Exists(BestScoreFile))
                 _bestScore = int.Parse(File.ReadAllText(BestScoreFile).Trim());
         }
-        catch { _bestScore = 0; }
+        catch
+        {
+            _bestScore = 0;
+        }
         Best = _bestScore;
     }
 

@@ -12,25 +12,43 @@ public class TileValueConverter : IValueConverter
 {
     public static readonly TileValueConverter Instance = new();
 
-    public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+    public object? Convert(
+        object? value,
+        Type targetType,
+        object? parameter,
+        System.Globalization.CultureInfo culture
+    )
     {
-        if (value is int v && v == 0) return string.Empty;
+        if (value is int v && v == 0)
+            return string.Empty;
         return value?.ToString();
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-        => throw new NotSupportedException();
+    public object? ConvertBack(
+        object? value,
+        Type targetType,
+        object? parameter,
+        System.Globalization.CultureInfo culture
+    ) => throw new NotSupportedException();
 }
 
 public class GameStateConverter : IValueConverter
 {
     public static readonly GameStateConverter Instance = new();
 
-    public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-        => value is true ? "You Win! 🎉" : "Game Over!";
+    public object? Convert(
+        object? value,
+        Type targetType,
+        object? parameter,
+        System.Globalization.CultureInfo culture
+    ) => value is true ? "You Win! 🎉" : "Game Over!";
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-        => throw new NotSupportedException();
+    public object? ConvertBack(
+        object? value,
+        Type targetType,
+        object? parameter,
+        System.Globalization.CultureInfo culture
+    ) => throw new NotSupportedException();
 }
 
 public partial class MainView : UserControl
@@ -63,7 +81,8 @@ public partial class MainView : UserControl
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
-        if (DataContext is not MainViewModel vm) return;
+        if (DataContext is not MainViewModel vm)
+            return;
 
         var dir = e.Key switch
         {
@@ -71,7 +90,7 @@ public partial class MainView : UserControl
             Key.Right or Key.D => "Right",
             Key.Up or Key.W => "Up",
             Key.Down or Key.S => "Down",
-            _ => null
+            _ => null,
         };
 
         if (dir != null)
@@ -89,13 +108,15 @@ public partial class MainView : UserControl
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (DataContext is not MainViewModel vm) return;
+        if (DataContext is not MainViewModel vm)
+            return;
 
         var end = e.GetPosition(this);
         var dx = end.X - _touchStart.X;
         var dy = end.Y - _touchStart.Y;
 
-        if (Math.Abs(dx) < SwipeThreshold && Math.Abs(dy) < SwipeThreshold) return;
+        if (Math.Abs(dx) < SwipeThreshold && Math.Abs(dy) < SwipeThreshold)
+            return;
 
         string dir;
         if (Math.Abs(dx) > Math.Abs(dy))
@@ -124,7 +145,12 @@ public partial class MainView : UserControl
         }
     }
 
-    private static async Task AnimateScaleAsync(TileViewModel tile, double from, double to, int durationMs)
+    private static async Task AnimateScaleAsync(
+        TileViewModel tile,
+        double from,
+        double to,
+        int durationMs
+    )
     {
         const int steps = 12;
         int stepDelay = Math.Max(1, durationMs / steps);

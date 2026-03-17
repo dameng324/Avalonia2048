@@ -17,7 +17,8 @@ public class GameBoardTests
     private static int[] GetRow(GameBoard board, int row)
     {
         var result = new int[GameBoard.BoardSize];
-        for (int c = 0; c < GameBoard.BoardSize; c++) result[c] = board.Grid[row, c];
+        for (int c = 0; c < GameBoard.BoardSize; c++)
+            result[c] = board.Grid[row, c];
         return result;
     }
 
@@ -25,7 +26,8 @@ public class GameBoardTests
     private static int[] GetCol(GameBoard board, int col)
     {
         var result = new int[GameBoard.BoardSize];
-        for (int r = 0; r < GameBoard.BoardSize; r++) result[r] = board.Grid[r, col];
+        for (int r = 0; r < GameBoard.BoardSize; r++)
+            result[r] = board.Grid[r, col];
         return result;
     }
 
@@ -35,13 +37,15 @@ public class GameBoardTests
     public async Task MoveLeft_MergesEqualTilesWithGapBetween()
     {
         // [0,2,0,2] -> [4,0,0,0] + 1 new random tile
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 2, 0, 2 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 2, 0, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -49,7 +53,9 @@ public class GameBoardTests
         await Assert.That(board.Grid[0, 0]).IsEqualTo(4);
         // Positions 1-3 should be 0 (except the 1 new random tile)
         int nonZeroCount = 0;
-        for (int c = 1; c < 4; c++) if (board.Grid[0, c] != 0) nonZeroCount++;
+        for (int c = 1; c < 4; c++)
+            if (board.Grid[0, c] != 0)
+                nonZeroCount++;
         // Only the spawned tile can make one cell non-zero
         await Assert.That(nonZeroCount).IsLessThanOrEqualTo(1);
     }
@@ -58,13 +64,15 @@ public class GameBoardTests
     public async Task MoveLeft_MergesAdjacentEqualTiles()
     {
         // [2,2,0,0] -> [4,0,0,0]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -75,13 +83,15 @@ public class GameBoardTests
     public async Task MoveLeft_DoesNotMergeMoreThanOncePerMove()
     {
         // [2,2,2,2] -> [4,4,0,0] (not [8,0,0,0])
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 2, 2 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 2, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -93,13 +103,15 @@ public class GameBoardTests
     public async Task MoveLeft_SlidesTilesWithNoMerge()
     {
         // [0,0,2,4] -> [2,4,0,0]
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 0, 2, 4 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 0, 2, 4 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -111,13 +123,15 @@ public class GameBoardTests
     public async Task MoveLeft_ReturnsFalseWhenNoChange()
     {
         // Already fully left, no merge possible
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 4, 8, 16 },
-            { 4, 8, 16, 32 },
-            { 8, 16, 32, 64 },
-            { 16, 32, 64, 128 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 8, 16 },
+                { 4, 8, 16, 32 },
+                { 8, 16, 32, 64 },
+                { 16, 32, 64, 128 },
+            }
+        );
 
         bool moved = board.Move(MoveDirection.Left);
 
@@ -127,13 +141,15 @@ public class GameBoardTests
     [Test]
     public async Task MoveLeft_MergesMultipleRowsCorrectly()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 4, 0, 4 },
-            { 2, 0, 2, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 4, 0, 4 },
+                { 2, 0, 2, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -145,13 +161,15 @@ public class GameBoardTests
     public async Task MoveLeft_NonEqualAdjacentTilesDoNotMerge()
     {
         // [2,4,0,0] -> stays [2,4,0,0]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 4, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         bool moved = board.Move(MoveDirection.Left);
 
@@ -168,13 +186,15 @@ public class GameBoardTests
     public async Task MoveRight_MergesEqualTilesWithGap()
     {
         // [2,0,2,0] -> [0,0,0,4]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 0, 2, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 0, 2, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Right);
 
@@ -185,13 +205,15 @@ public class GameBoardTests
     public async Task MoveRight_DoesNotMergeMoreThanOnce()
     {
         // [2,2,2,2] -> [0,0,4,4]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 2, 2 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 2, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Right);
 
@@ -207,13 +229,15 @@ public class GameBoardTests
     public async Task MoveUp_MergesEqualTilesInColumn()
     {
         // Column 0: [0,2,0,2] -> [4,0,0,0]
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 2, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Up);
 
@@ -224,13 +248,15 @@ public class GameBoardTests
     public async Task MoveUp_DoesNotMergeMoreThanOnce()
     {
         // Column 0: [2,2,2,2] -> [4,4,0,0]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Up);
 
@@ -246,13 +272,15 @@ public class GameBoardTests
     public async Task MoveDown_MergesEqualTilesInColumn()
     {
         // Column 0: [2,0,2,0] -> [0,0,0,4]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Down);
 
@@ -263,13 +291,15 @@ public class GameBoardTests
     public async Task MoveDown_DoesNotMergeMoreThanOnce()
     {
         // Column 0: [2,2,2,2] -> [0,0,4,4]
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 },
-            { 2, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+                { 2, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Down);
 
@@ -284,13 +314,15 @@ public class GameBoardTests
     [Test]
     public async Task Score_IncreasedByMergedTileValue()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -301,13 +333,15 @@ public class GameBoardTests
     public async Task Score_SumOfAllMerges()
     {
         // Two merges in a single move: [2,2,4,4] left -> [4,8,0,0], score = 4+8 = 12
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 4, 4 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 4, 4 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -321,13 +355,15 @@ public class GameBoardTests
     [Test]
     public async Task GameWon_WhenTileReaches2048()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 1024, 1024, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 1024, 1024, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -338,13 +374,15 @@ public class GameBoardTests
     public async Task GameOver_WhenNoMovesAvailable()
     {
         // Full board with no adjacent equal tiles
-        var board = MakeBoard(new int[,]
-        {
-            {  2,  4,  2,  4 },
-            {  4,  2,  4,  2 },
-            {  2,  4,  2,  4 },
-            {  4,  2,  4,  2 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 2, 4 },
+                { 4, 2, 4, 2 },
+                { 2, 4, 2, 4 },
+                { 4, 2, 4, 2 },
+            }
+        );
 
         // The board is already full and stuck, so after checking state it should be game over.
         // Trigger state check by attempting a move (it won't change anything).
@@ -367,13 +405,15 @@ public class GameBoardTests
         //  8, 16,  8, 64
         // 16,  4,  2,  8
         // No valid moves exist in any direction.
-        var board = MakeBoard(new int[,]
-        {
-            {  2,  4,  8, 16 },
-            {  4, 32,  2, 256 },
-            {  8, 16,  8, 64 },
-            { 16,  4,  2,  8 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 8, 16 },
+                { 4, 32, 2, 256 },
+                { 8, 16, 8, 64 },
+                { 16, 4, 2, 8 },
+            }
+        );
 
         // Attempt any move – all should return false and game over must be detected.
         bool moved = board.Move(MoveDirection.Left);
@@ -388,10 +428,10 @@ public class GameBoardTests
         // Same board tested for all 4 directions to confirm no move is possible.
         int[,] grid =
         {
-            {  2,  4,  8, 16 },
-            {  4, 32,  2, 256 },
-            {  8, 16,  8, 64 },
-            { 16,  4,  2,  8 }
+            { 2, 4, 8, 16 },
+            { 4, 32, 2, 256 },
+            { 8, 16, 8, 64 },
+            { 16, 4, 2, 8 },
         };
 
         await Assert.That(MakeBoard(grid).Move(MoveDirection.Left)).IsFalse();
@@ -403,13 +443,15 @@ public class GameBoardTests
     [Test]
     public async Task GameNotOver_WhenEmptyCellExists()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 4, 8, 16 },
-            { 4, 8, 16, 32 },
-            { 8, 16, 32, 64 },
-            { 16, 32, 64, 0 }  // one empty cell
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 8, 16 },
+                { 4, 8, 16, 32 },
+                { 8, 16, 32, 64 },
+                { 16, 32, 64, 0 }, // one empty cell
+            }
+        );
 
         await Assert.That(board.GameOver).IsFalse();
     }
@@ -421,13 +463,15 @@ public class GameBoardTests
     [Test]
     public async Task MergedTiles_ContainsMergedPosition()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 2, 0, 2 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 2, 0, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -440,13 +484,15 @@ public class GameBoardTests
     [Test]
     public async Task MergedTiles_ClearedOnNextMove()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 2, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 4 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 2, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 4 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
         board.Move(MoveDirection.Right);
@@ -463,13 +509,15 @@ public class GameBoardTests
     [Test]
     public async Task NewTiles_SpawnedAfterSuccessfulMove()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 0, 2, 0, 2 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 0, 2, 0, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -479,13 +527,15 @@ public class GameBoardTests
     [Test]
     public async Task NewTiles_NotSpawnedOnNoMove()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 2, 4, 8, 16 },
-            { 4, 8, 16, 32 },
-            { 8, 16, 32, 64 },
-            { 16, 32, 64, 128 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 2, 4, 8, 16 },
+                { 4, 8, 16, 32 },
+                { 8, 16, 32, 64 },
+                { 16, 32, 64, 128 },
+            }
+        );
 
         board.Move(MoveDirection.Left);
 
@@ -499,13 +549,15 @@ public class GameBoardTests
     [Test]
     public async Task Reset_ClearsGridAndScore()
     {
-        var board = MakeBoard(new int[,]
-        {
-            { 512, 512, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 }
-        });
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 512, 512, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
 
         board.Move(MoveDirection.Left); // score += 1024
         board.Reset();
@@ -523,8 +575,9 @@ public class GameBoardTests
 
         int count = 0;
         for (int r = 0; r < 4; r++)
-            for (int c = 0; c < 4; c++)
-                if (board.Grid[r, c] != 0) count++;
+        for (int c = 0; c < 4; c++)
+            if (board.Grid[r, c] != 0)
+                count++;
 
         await Assert.That(count).IsEqualTo(2);
     }

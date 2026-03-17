@@ -8,7 +8,7 @@ public enum MoveDirection
     Up,
     Down,
     Left,
-    Right
+    Right,
 }
 
 public class Tile
@@ -44,7 +44,8 @@ public class GameBoard
     /// </summary>
     public GameBoard(bool empty)
     {
-        if (!empty) Reset();
+        if (!empty)
+            Reset();
     }
 
     /// <summary>
@@ -53,8 +54,8 @@ public class GameBoard
     public void LoadGrid(int[,] grid)
     {
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-                Grid[r, c] = grid[r, c];
+        for (int c = 0; c < Size; c++)
+            Grid[r, c] = grid[r, c];
     }
 
     public void Reset()
@@ -63,8 +64,8 @@ public class GameBoard
         GameOver = false;
         GameWon = false;
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-                Grid[r, c] = 0;
+        for (int c = 0; c < Size; c++)
+            Grid[r, c] = 0;
 
         AddRandomTile();
         AddRandomTile();
@@ -148,7 +149,8 @@ public class GameBoard
         // 1. Compress: collect non-zero values in order.
         var values = new List<int>(Size);
         foreach (int v in line)
-            if (v != 0) values.Add(v);
+            if (v != 0)
+                values.Add(v);
 
         // 2. Merge adjacent equal pairs (left-to-right through the compressed list).
         for (int i = 0; i < values.Count - 1; i++)
@@ -163,12 +165,26 @@ public class GameBoard
                 if (isRow)
                 {
                     int col = forward ? mergedPos : Size - 1 - mergedPos;
-                    MergedTiles.Add(new Tile { Row = index, Col = col, Value = values[i] });
+                    MergedTiles.Add(
+                        new Tile
+                        {
+                            Row = index,
+                            Col = col,
+                            Value = values[i],
+                        }
+                    );
                 }
                 else
                 {
                     int row = forward ? mergedPos : Size - 1 - mergedPos;
-                    MergedTiles.Add(new Tile { Row = row, Col = index, Value = values[i] });
+                    MergedTiles.Add(
+                        new Tile
+                        {
+                            Row = row,
+                            Col = index,
+                            Value = values[i],
+                        }
+                    );
                 }
 
                 values.RemoveAt(i + 1);
@@ -183,7 +199,11 @@ public class GameBoard
         // 4. Check if anything changed.
         bool changed = false;
         for (int i = 0; i < Size; i++)
-            if (result[i] != line[i]) { changed = true; break; }
+            if (result[i] != line[i])
+            {
+                changed = true;
+                break;
+            }
 
         return (result, changed);
     }
@@ -192,36 +212,48 @@ public class GameBoard
     {
         var empty = new List<(int r, int c)>();
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-                if (Grid[r, c] == 0)
-                    empty.Add((r, c));
+        for (int c = 0; c < Size; c++)
+            if (Grid[r, c] == 0)
+                empty.Add((r, c));
 
-        if (empty.Count == 0) return;
+        if (empty.Count == 0)
+            return;
 
         var (row, col) = empty[_random.Next(empty.Count)];
         Grid[row, col] = _random.Next(10) < 9 ? 2 : 4;
-        NewTiles.Add(new Tile { Row = row, Col = col, Value = Grid[row, col], IsNew = true });
+        NewTiles.Add(
+            new Tile
+            {
+                Row = row,
+                Col = col,
+                Value = Grid[row, col],
+                IsNew = true,
+            }
+        );
     }
 
     private void CheckGameState()
     {
         // Check for 2048
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-                if (Grid[r, c] == 2048)
-                {
-                    GameWon = true;
-                    return;
-                }
+        for (int c = 0; c < Size; c++)
+            if (Grid[r, c] == 2048)
+            {
+                GameWon = true;
+                return;
+            }
 
         // Check if any moves available
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-            {
-                if (Grid[r, c] == 0) return;
-                if (r + 1 < Size && Grid[r, c] == Grid[r + 1, c]) return;
-                if (c + 1 < Size && Grid[r, c] == Grid[r, c + 1]) return;
-            }
+        for (int c = 0; c < Size; c++)
+        {
+            if (Grid[r, c] == 0)
+                return;
+            if (r + 1 < Size && Grid[r, c] == Grid[r + 1, c])
+                return;
+            if (c + 1 < Size && Grid[r, c] == Grid[r, c + 1])
+                return;
+        }
 
         GameOver = true;
     }
@@ -230,8 +262,8 @@ public class GameBoard
     {
         var snapshot = new int[Size, Size];
         for (int r = 0; r < Size; r++)
-            for (int c = 0; c < Size; c++)
-                snapshot[r, c] = Grid[r, c];
+        for (int c = 0; c < Size; c++)
+            snapshot[r, c] = Grid[r, c];
         return snapshot;
     }
 }
