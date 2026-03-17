@@ -5,7 +5,7 @@ using Avalonia.Media;
 using Foundation;
 using UIKit;
 
-namespace avalonia2048.iOS;
+namespace Avalonia2048.iOS;
 
 // The UIApplicationDelegate for the application. This class is responsible for launching the
 // User Interface of the application, as well as listening (and optionally responding) to

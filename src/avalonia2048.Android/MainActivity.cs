@@ -3,10 +3,10 @@ using Android.Content.PM;
 using Avalonia;
 using Avalonia.Android;
 
-namespace avalonia2048.Android;
+namespace Avalonia2048.Android;
 
 [Activity(
-    Label = "avalonia2048.Android",
+    Label = "Avalonia2048",
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,

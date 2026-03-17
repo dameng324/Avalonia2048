@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace avalonia2048.Models;
+namespace Avalonia2048.Models;
 
 public enum MoveDirection
 {
@@ -25,6 +25,8 @@ public class GameBoard
     private const int Size = 4;
     public const int BoardSize = Size;
     private readonly Random _random = new();
+
+    private int _winThreshold = 2048;
 
     public int[,] Grid { get; } = new int[Size, Size];
     public int Score { get; private set; }
@@ -63,6 +65,7 @@ public class GameBoard
         Score = 0;
         GameOver = false;
         GameWon = false;
+        _winThreshold = 2048;
         for (int r = 0; r < Size; r++)
         for (int c = 0; c < Size; c++)
             Grid[r, c] = 0;
@@ -232,14 +235,17 @@ public class GameBoard
         );
     }
 
+    public void KeepGoing() => GameWon = false;
+
     private void CheckGameState()
     {
-        // Check for 2048
+        // Check for win threshold
         for (int r = 0; r < Size; r++)
         for (int c = 0; c < Size; c++)
-            if (Grid[r, c] == 2048)
+            if (Grid[r, c] >= _winThreshold)
             {
                 GameWon = true;
+                _winThreshold *= 2;
                 return;
             }
 

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using avalonia2048.Models;
+using Avalonia2048.Models;
 
-namespace avalonia2048.Tests;
+namespace Avalonia2048.Tests;
 
 public class GameBoardTests
 {
@@ -540,6 +540,74 @@ public class GameBoardTests
         board.Move(MoveDirection.Left);
 
         await Assert.That(board.NewTiles.Count).IsEqualTo(0);
+    }
+
+    #endregion
+
+    #region Keep Going
+
+    [Test]
+    public async Task KeepGoing_ClearsWinFlagAnd2048DoesNotTriggerWinAgain()
+    {
+        // Win at 2048 — threshold doubles to 4096 internally
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 1024, 1024, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
+        board.Move(MoveDirection.Left);
+        await Assert.That(board.GameWon).IsTrue();
+
+        board.KeepGoing();
+        await Assert.That(board.GameWon).IsFalse();
+
+        // Load a board with 2048 already present — threshold is now 4096
+        board.LoadGrid(
+            new int[,]
+            {
+                { 2048, 0, 0, 2 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
+        board.Move(MoveDirection.Right);
+        await Assert.That(board.GameWon).IsFalse();
+    }
+
+    [Test]
+    public async Task KeepGoing_ReachingNextThreshold_TriggersWinAgain()
+    {
+        // Win at 2048 first
+        var board = MakeBoard(
+            new int[,]
+            {
+                { 1024, 1024, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
+        board.Move(MoveDirection.Left);
+        board.KeepGoing(); // threshold is now 4096
+
+        // Now merge two 2048 tiles to get 4096
+        board.LoadGrid(
+            new int[,]
+            {
+                { 2048, 2048, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+            }
+        );
+        board.Move(MoveDirection.Left);
+
+        await Assert.That(board.GameWon).IsTrue();
     }
 
     #endregion

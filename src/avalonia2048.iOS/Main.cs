@@ -1,6 +1,6 @@
 using UIKit;
 
-namespace avalonia2048.iOS;
+namespace Avalonia2048.iOS;
 
 public class Application
 {

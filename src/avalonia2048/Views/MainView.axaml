@@ -1,8 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:avalonia2048.ViewModels"
-             xmlns:views="using:avalonia2048.Views"
-             x:Class="avalonia2048.Views.MainView"
+             xmlns:vm="using:Avalonia2048.ViewModels"
+             xmlns:views="using:Avalonia2048.Views"
+             x:Class="Avalonia2048.Views.MainView"
              x:DataType="vm:MainViewModel"
              Background="#faf8ef"
              Focusable="True">

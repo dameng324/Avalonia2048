@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using avalonia2048.ViewModels;
-using avalonia2048.Views;
+using Avalonia2048.ViewModels;
+using Avalonia2048.Views;
 
-namespace avalonia2048;
+namespace Avalonia2048;
 
 public partial class App : Application
 {
@@ -15,6 +15,8 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        ViewLocator.Register<MainViewModel, MainView>();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow { DataContext = new MainViewModel() };

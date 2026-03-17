@@ -1,21 +1,28 @@
 using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using avalonia2048.ViewModels;
+using Avalonia2048.ViewModels;
 
-namespace avalonia2048;
+namespace Avalonia2048;
 
 public class ViewLocator : IDataTemplate
 {
+    private static readonly Dictionary<Type, Func<Control>> _registry = new();
+
+    public static void Register<TViewModel, TView>()
+        where TView : Control, new()
+    {
+        _registry[typeof(TViewModel)] = static () => new TView();
+    }
+
     public Control? Build(object? data)
     {
         if (data is null)
             return null;
-        var name = data.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-        var type = Type.GetType(name);
-        return type != null
-            ? (Control)Activator.CreateInstance(type)!
-            : new TextBlock { Text = "Not Found: " + name };
+        if (_registry.TryGetValue(data.GetType(), out var factory))
+            return factory();
+        return new TextBlock { Text = "Not Found: " + data.GetType().FullName };
     }
 
     public bool Match(object? data) => data is ViewModelBase;

@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
-using avalonia2048.Models;
+using Avalonia2048.Models;
+using Avalonia2048.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace avalonia2048.ViewModels;
+namespace Avalonia2048.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     private readonly GameBoard _board = new();
+    private readonly IScoreStorage _storage;
     private int _bestScore;
-    private static readonly string BestScoreFile = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "avalonia2048_best.txt"
-    );
 
     [ObservableProperty]
     private ObservableCollection<TileViewModel> _tiles = new();
@@ -38,11 +36,24 @@ public partial class MainViewModel : ViewModelBase
 
     public event Func<TileViewModel, bool, Task>? TileAnimationRequested;
 
-    public MainViewModel()
+    public MainViewModel(IScoreStorage? storage = null)
     {
+        _storage = storage ?? CreateDefaultStorage();
         LoadBestScore();
         InitializeTiles();
         SyncFromBoard();
+    }
+
+    private static IScoreStorage CreateDefaultStorage()
+    {
+        try
+        {
+            var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (!string.IsNullOrEmpty(folder))
+                return new FileScoreStorage(Path.Combine(folder, "Avalonia2048", "best.txt"));
+        }
+        catch { }
+        return new InMemoryScoreStorage();
     }
 
     private void InitializeTiles()
@@ -85,7 +96,7 @@ public partial class MainViewModel : ViewModelBase
     {
         if (!Enum.TryParse<MoveDirection>(directionStr, out var direction))
             return;
-        if (IsGameOver || IsGameWon)
+        if (IsGameOver)
             return;
 
         bool moved = _board.Move(direction);
@@ -134,31 +145,16 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public void ContinueGame()
     {
+        _board.KeepGoing();
         IsGameWon = false;
         ShowOverlay = false;
     }
 
     private void LoadBestScore()
     {
-        try
-        {
-            if (File.Exists(BestScoreFile))
-                _bestScore = int.Parse(File.ReadAllText(BestScoreFile).Trim());
-        }
-        catch
-        {
-            _bestScore = 0;
-        }
+        _bestScore = _storage.LoadBestScore();
         Best = _bestScore;
     }
 
-    private void SaveBestScore()
-    {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(BestScoreFile)!);
-            File.WriteAllText(BestScoreFile, _bestScore.ToString());
-        }
-        catch { }
-    }
+    private void SaveBestScore() => _storage.SaveBestScore(_bestScore);
 }

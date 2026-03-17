@@ -4,9 +4,9 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using avalonia2048.ViewModels;
+using Avalonia2048.ViewModels;
 
-namespace avalonia2048.Views;
+namespace Avalonia2048.Views;
 
 public class TileValueConverter : IValueConverter
 {

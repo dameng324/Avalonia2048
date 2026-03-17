@@ -1,8 +1,8 @@
 ﻿using System;
 using Avalonia;
-using avalonia2048;
+using Avalonia2048;
 
-namespace avalonia2048.Desktop;
+namespace Avalonia2048.Desktop;
 
 sealed class Program
 {
