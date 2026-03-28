@@ -4,7 +4,26 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ToolCommandName>avalonia2048</ToolCommandName>
+    <PackageId>Avalonia2048.Tool</PackageId>
+    <Authors>dameng324</Authors>
+    <Description>A cross-platform 2048 puzzle game built with Avalonia UI.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dameng324/Avalonia2048</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dameng324/Avalonia2048</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>avalonia;2048;game;dotnet-tool</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <!-- NuGet tool packaging requires OutputType=Exe; only applied when packing as a tool -->
+  <PropertyGroup Condition="'$(PackAsTool)' == 'true'">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />

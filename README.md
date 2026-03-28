@@ -24,7 +24,22 @@ A cross-platform implementation of the classic [2048](https://play2048.co/) puzz
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download) or later
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+
+### Install as a .NET Global Tool
+
+The desktop app is published to [NuGet.org](https://www.nuget.org/packages/Avalonia2048.Tool) as a .NET global tool:
+
+```bash
+dotnet tool install -g Avalonia2048.Tool
+avalonia2048
+```
+
+To update to the latest version:
+
+```bash
+dotnet tool update -g Avalonia2048.Tool
+```
 
 ### Run on Desktop
 
