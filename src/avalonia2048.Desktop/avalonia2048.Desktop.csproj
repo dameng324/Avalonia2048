@@ -1,10 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>avalonia2048</ToolCommandName>
+    <PackageId>Avalonia2048.Tool</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>dameng324</Authors>
+    <Description>A cross-platform 2048 puzzle game built with Avalonia UI.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dameng324/Avalonia2048</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dameng324/Avalonia2048</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>avalonia;2048;game;dotnet-tool</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
