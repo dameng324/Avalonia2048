@@ -1,34 +1,41 @@
-name: Release v1.0.0
+name: Create Release Tag
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
-env:
-  TAG_NAME: v1.0.0
+    inputs:
+      tag_name:
+        description: "Tag name (e.g. v1.0.0)"
+        required: true
+        default: "v1.0.0"
 
 jobs:
   tag:
-    name: Create v1.0.0 tag
+    name: Create release tag
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - name: Validate tag name
+        run: |
+          if ! echo "${{ github.event.inputs.tag_name }}" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$'; then
+            echo "Error: '${{ github.event.inputs.tag_name }}' is not a valid tag name. Expected format: v<major>.<minor>.<patch> (e.g. v1.0.0)"
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Create v1.0.0 tag
+      - name: Create tag
         run: |
+          TAG="${{ github.event.inputs.tag_name }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            git tag "$TAG_NAME"
-            git push origin "$TAG_NAME"
-          else
-            echo "Tag $TAG_NAME already exists, skipping."
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+            exit 1
           fi
+          git tag "$TAG"
+          git push origin "$TAG"
 
