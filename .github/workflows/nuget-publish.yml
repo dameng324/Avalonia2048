@@ -26,6 +26,7 @@ jobs:
         run: |
           dotnet pack src/avalonia2048.Desktop/avalonia2048.Desktop.csproj \
             -c Release \
+            -p:PackAsTool=true \
             -p:Version=${GITHUB_REF_NAME#v} \
             -o nupkg
 
